@@ -25,6 +25,16 @@ function NavBar(props) {
             Contact
           </Link>
         </li>
+        <li>
+          <Link href="/print" className="text-blue-500 hover:underline">
+            Print
+          </Link>
+        </li>
+        <li>
+          <Link href="/printfixed" className="text-blue-500 hover:underline">
+            Print Fixed
+          </Link>
+        </li>
       </ul>
     </nav>
   );
