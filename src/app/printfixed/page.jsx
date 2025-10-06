@@ -1,5 +1,6 @@
 'use client';
 import React from "react";
+import { MathJax, MathJaxContext } from "better-react-mathjax";
 import "./PrintDocument.css"; // optional extra styles
 
 export default function PrintDocument() {
@@ -47,62 +48,81 @@ export default function PrintDocument() {
   };
 
   return (
-    <div className="print-container">
-      <button onClick={handlePrint} className="print-btn">
-        Print Document
-      </button>
+    <MathJaxContext>
+      <div className="print-container">
+        <button onClick={handlePrint} className="print-btn">
+          Print Document
+        </button>
 
-      {/* Inject watermark styles */}
-      <style>
-        {`
-          @media print {
-            body::before {
-              content: "${watermarkSettings.text}";
-              position: fixed;
-              ${Object.entries(getWatermarkPositionStyles(watermarkSettings.position))
-                .map(([k, v]) => `${k}: ${v};`)
-                .join("\n")}
-              transform: ${
-                getWatermarkPositionStyles(watermarkSettings.position).transform || ""
-              } ${getWatermarkRotation(watermarkSettings.orientation)};
-              font-size: ${watermarkSettings.fontSize}px;
-              font-family: '${watermarkSettings.fontFamily}', sans-serif;
-              opacity: ${watermarkSettings.opacity / 100};
-              color: #000;
-              white-space: nowrap;
-              z-index: 9999;
-              pointer-events: none;
-              user-select: none;
-            }
-          }
-          @media screen {
-            body::before {
-              display: none;
-            }
-          }
-        `}
-      </style>
+        {/* Inject print-only styles */}
+        <style>
+          {`
+            /* Hide everything except .print-content during print */
+            @media print {
+              body * {
+                visibility: hidden !important;
+              }
+              .print-container,
+              .print-container * {
+                visibility: visible !important;
+              }
+              .print-container {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+              }
+              .print-btn {
+                display: none !important; /* don't print the button */
+              }
 
-      {/* Printable content */}
-      <div className="print-content">
-        <h1>Dummy Document</h1>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod,
-          urna eu tincidunt consectetur, nisi nisl aliquam nunc, eget egestas
-          nunc nisl eget nunc. Praesent euismod, nisl eget consectetur
-          consectetur, nunc nisl aliquam nunc, eget egestas nunc nisl eget nunc.
-        </p>
-        <p>
-          (Repeat this text many times to make sure it covers 2–3 pages when
-          printed)...
-        </p>
-        {Array.from({ length: 30 }).map((_, i) => (
-          <p key={i}>
-            Page filler paragraph {i + 1}: Lorem ipsum dolor sit amet,
-            consectetur adipiscing elit. Nulla facilisi.
+              body::before {
+                content: "${watermarkSettings.text}";
+                position: fixed;
+                ${Object.entries(getWatermarkPositionStyles(watermarkSettings.position))
+                  .map(([k, v]) => `${k}: ${v};`)
+                  .join("\n")}
+                transform: ${
+                  getWatermarkPositionStyles(watermarkSettings.position).transform || ""
+                } ${getWatermarkRotation(watermarkSettings.orientation)};
+                font-size: ${watermarkSettings.fontSize}px;
+                font-family: '${watermarkSettings.fontFamily}', sans-serif;
+                opacity: ${watermarkSettings.opacity / 100};
+                color: #000;
+                white-space: nowrap;
+                z-index: 9999;
+                pointer-events: none;
+                user-select: none;
+              }
+            }
+
+            @media screen {
+              body::before {
+                display: none;
+              }
+            }
+          `}
+        </style>
+
+        {/* Printable content */}
+        <div className="print-content">
+          <h1>Dummy Document with MathJax</h1>
+          <p>
+            Example inline formula: <MathJax inline>{"\\(E = mc^2\\)"}</MathJax>
           </p>
-        ))}
+          <p>
+            Example block formula:
+            <MathJax>{"\\[ \\frac{a}{b} + \\sqrt{x^2 + y^2} \\]"}</MathJax>
+          </p>
+
+          {Array.from({ length: 40 }).map((_, i) => (
+            <p key={i}>
+              Page filler paragraph {i + 1}: Lorem ipsum dolor sit amet,
+              consectetur adipiscing elit. Nulla facilisi.
+            </p>
+          ))}
+        </div>
       </div>
-    </div>
+    </MathJaxContext>
   );
-};
+}
